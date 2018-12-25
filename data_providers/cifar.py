@@ -77,7 +77,7 @@ class CifarDataSet(ImagesDataSet):
         batch_size = 128
         class_per_batch = batch_size/4
         reorder_list_ = []
-        for i in random.sample(range(n_class),n_class):
+        for i in random.sample(list(range(n_class)),n_class):
             list_ = np.where(labels==i)[0]
             list_ = random.sample(list_,len(list_))
             reorder_list_.append(list_)
@@ -91,7 +91,7 @@ class CifarDataSet(ImagesDataSet):
             assert(len(set(labels[shuffle_list[i*batch_size:i*batch_size+batch_size]]))==class_per_batch)
         images = images[shuffle_list]
         labels = labels[shuffle_list]
-        print 'images.shape',images.shape
+        print('images.shape',images.shape)
         return images,labels
         
     @property

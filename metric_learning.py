@@ -42,15 +42,15 @@ training = True
 feature_extract = False
 
 if training:
-    print("Data provider train images: ", data_provider.train.num_examples)
+    print(("Data provider train images: ", data_provider.train.num_examples))
     model.load_pretrained_model()
     model.train_all_epochs(train_params_cifar)
     
 if feature_extract:
     model.load_model()
-    print("Data provider test images: ", data_provider.test.num_examples)
+    print(("Data provider test images: ", data_provider.test.num_examples))
     feature_embeddings,gt_labels = model.feature_extracting(data_provider.test, batch_size=100)
-    print(feature_embeddings.shape)
+    print((feature_embeddings.shape))
     np.save('feature_embedding.npy',feature_embeddings)
-    print(gt_labels.shape)
+    print((gt_labels.shape))
     np.save('gt_labels.npy',gt_labels)

@@ -101,7 +101,7 @@ class DataProvider:
             labels: 1D numpy array
         """
         new_labels = np.zeros((labels.shape[0], self.n_classes))
-        new_labels[range(labels.shape[0]), labels] = np.ones(labels.shape)
+        new_labels[list(range(labels.shape[0])), labels] = np.ones(labels.shape)
         return new_labels
 
     def labels_from_one_hot(self, labels):

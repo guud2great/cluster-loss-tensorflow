@@ -6,7 +6,7 @@ from datetime import timedelta
 from data_providers.utils import get_data_provider_by_name
 import numpy as np
 import tensorflow as tf
-import metric_loss_ops as metric_loss
+from . import metric_loss_ops as metric_loss
 
 class DenseNet:
     def __init__(self, data_provider, densenet_params):
@@ -37,16 +37,16 @@ class DenseNet:
         self.batches_step = 0
         
         if not self.bc_mode:
-            print("Build %s model with %d blocks, "
+            print(("Build %s model with %d blocks, "
                   "%d composite layers each." % (
-                      self.model_type, self.total_blocks, self.layers_per_block))
+                      self.model_type, self.total_blocks, self.layers_per_block)))
         if self.bc_mode:
             self.layers_per_block = self.layers_per_block // 2
-            print("Build %s model with %d blocks, "
+            print(("Build %s model with %d blocks, "
                   "%d bottleneck layers and %d composite layers each." % (
                       self.model_type, self.total_blocks, self.layers_per_block,
-                      self.layers_per_block))
-        print("Reduction at transition layers: %.1f" % self.reduction)
+                      self.layers_per_block)))
+        print(("Reduction at transition layers: %.1f" % self.reduction))
 
         self._define_inputs()
         self._build_graph()
@@ -72,7 +72,7 @@ class DenseNet:
             for dim in shape:
                 variable_parametes *= dim.value
             total_parameters += variable_parametes
-        print("Total training params: %.1fM" % (total_parameters / 1e6))
+        print(("Total training params: %.1fM" % (total_parameters / 1e6)))
 
 
     def save_model(self, global_step=None):
@@ -81,14 +81,14 @@ class DenseNet:
     def load_model(self):
         var = tf.global_variables()
         for var_ in var:
-            print var_.name
+            print(var_.name)
         try:
             tf.train.Saver().restore(self.sess, self.save_path)
         except Exception as e:
             raise IOError("Failed to to load model "
                           "from save path: %s" % self.save_path)
         tf.train.Saver().restore(self.sess, self.save_path)
-        print("Successfully load model from save path: %s" % self.save_path)
+        print(("Successfully load model from save path: %s" % self.save_path))
 
     def load_pretrained_model(self):
         var = tf.global_variables()
@@ -102,11 +102,11 @@ class DenseNet:
             raise IOError("Failed to to load model "
                           "from save path: %s" % self.pretrained_model)
         tf.train.Saver(var_to_restore).restore(self.sess, self.pretrained_model)
-        print("Successfully load model from save path: %s" % self.pretrained_model)
+        print(("Successfully load model from save path: %s" % self.pretrained_model))
 
     def log_loss(self, loss, epoch, prefix, should_print=True):
         if should_print:
-            print("%s, epoch %d, mean cross_entropy: %f" % (prefix, epoch, loss))
+            print(("%s, epoch %d, mean cross_entropy: %f" % (prefix, epoch, loss)))
         summary = tf.Summary(value=[
             tf.Summary.Value(
                 tag='loss_%s' % prefix, simple_value=float(loss)),
@@ -288,11 +288,11 @@ class DenseNet:
         reduce_lr_epoch_2 = train_params['reduce_lr_epoch_2']
         total_start_time = time.time()
         for epoch in range(1, n_epochs + 1):
-            print ("Train epoch: %d " % epoch)
+            print(("Train epoch: %d " % epoch))
             start_time = time.time()
             if epoch == reduce_lr_epoch_1 or epoch == reduce_lr_epoch_2:
                 learning_rate = learning_rate / 10
-                print("Decrease learning rate, new lr = %f" % learning_rate)
+                print(("Decrease learning rate, new lr = %f" % learning_rate))
 
 
             loss = self.train_one_epoch(self.data_provider.train, batch_size, learning_rate)
@@ -305,16 +305,16 @@ class DenseNet:
 
             time_per_epoch = time.time() - start_time
             seconds_left = int((n_epochs - epoch) * time_per_epoch)
-            print("Time per epoch: %s, Est. complete in: %s" % (
+            print(("Time per epoch: %s, Est. complete in: %s" % (
                 str(timedelta(seconds=time_per_epoch)),
-                str(timedelta(seconds=seconds_left))))
+                str(timedelta(seconds=seconds_left)))))
 
             if self.should_save_model:
                 self.save_model()
 
         total_training_time = time.time() - total_start_time
-        print("\nTotal training time: %s" % str(timedelta(
-            seconds=total_training_time)))
+        print(("\nTotal training time: %s" % str(timedelta(
+            seconds=total_training_time))))
 
     def train_one_epoch(self, data, batch_size, learning_rate):
         num_examples = data.num_examples
@@ -340,14 +340,14 @@ class DenseNet:
             self.log_loss(loss, self.batches_step, prefix='per_batch',should_print=False)
         gt_labels = np.array(gt_labels).reshape(-1,1)
         total_feature_embeddings = np.array(total_feature_embeddings).reshape(-1,self.embedding_dim)
-        print "NMI_score is {}".format(show_NMI(feature_embeddings,labels))
+        print("NMI_score is {}".format(show_NMI(feature_embeddings,labels)))
         mean_loss = np.mean(total_loss)
         return mean_loss
 
     def show_NMI(self,feature_embeddings,labels):
         kmeans = KMeans(n_clusters=self.n_classes).fit(feature_embeddings)
-        print feature_embeddings.shape
-        print labels.shape
+        print(feature_embeddings.shape)
+        print(labels.shape)
         NMI_score = normalized_mutual_info_score(label,kmeans.labels_)
         return NMI_score
 

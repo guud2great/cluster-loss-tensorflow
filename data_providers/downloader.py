@@ -1,6 +1,6 @@
 import sys
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import tarfile
 import zipfile
 
@@ -19,8 +19,8 @@ def download_data_url(url, download_dir):
     if not os.path.exists(file_path):
         os.mkdir(download_dir)
 
-        print("Download %s to %s" % (url, file_path))
-        file_path, _ = urllib.urlretrieve(
+        print(("Download %s to %s" % (url, file_path)))
+        file_path, _ = urllib.request.urlretrieve(
             url=url,
             filename=file_path,
             reporthook=report_download_progress)
